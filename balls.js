@@ -88,9 +88,12 @@ class Ball {
             if (this !== balls[i]) {
                 const dx = this.#position.x - balls[i].#position.x;
                 const dy = this.#position.y - balls[i].#position.y;
-                const d = Math.sqrt(dx * dx + dy * dy);
 
-                if (d < this.#radius + balls[i].#radius) {
+                const dsqr = dx * dx + dy * dy;
+                const sizesum = this.#radius + balls[i].#radius;
+                if (dsqr < sizesum * sizesum) {
+                    const d = Math.sqrt(dsqr);
+
                     const normal = {x: dx / d, y: dy / d};
                     const dpNormal = {
                         x: this.#velocity.x * normal.x + this.#velocity.y * normal.y,
