@@ -1,0 +1,41 @@
+html, body{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+canvas{
+    display: block;
+    position: absolute;
+    z-index: 0;
+}
+
+.message {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 10%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    font-weight: bold;
+    color: #d4ff5a;
+    text-shadow: 0 1px 2px black, 0 1px 2px black, 0 1px 2px black, 0 1px 2px black;
+
+    pointer-events: none;
+    user-select: none;
+
+    animation: fadeOut 10s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
