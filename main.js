@@ -19,12 +19,12 @@ window.addEventListener('load', () => {
 
         context.fillStyle = "red";
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 150; i++) {
             balls.push(new Ball(
-                900+50*i,
-                50,
-                Math.random() * 10 + 5,
-                {x: 50, y: 0}
+                300,
+                500,
+                Math.random() * 25 + 5,
+                {x: 50, y: -50}
             ));
         }
 
@@ -34,7 +34,7 @@ window.addEventListener('load', () => {
 
 
 let t1 = 0;
-const steps = 8;
+const steps = 16;
 const fps = 1000/60;
 function render() {
     requestAnimationFrame(render)
