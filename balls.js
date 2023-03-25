@@ -72,6 +72,10 @@ class Ball {
             this.#velocity.y = -this.#velocity.y * Ball.restitution;
             this.#position.y = canvas.height - this.#radius;
         }
+        if (this.#position.y < this.#radius) {
+            this.#velocity.y = -this.#velocity.y * Ball.restitution;
+            this.#position.y = this.#radius;
+        }
         if (this.#position.x > canvas.width - this.#radius) {
             this.#velocity.x = -this.#velocity.x * Ball.restitution;
             this.#position.x = canvas.width - this.#radius;
