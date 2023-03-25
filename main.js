@@ -1,8 +1,8 @@
 let context = null;
 let canvas = null;
 let balls = [];
-let interval = null;
-render = render.bind(this);
+
+//render = render.bind();
 window.addEventListener('load', () => {
     // Get the canvas element
     canvas = document.getElementById('canvas');
@@ -18,13 +18,13 @@ window.addEventListener('load', () => {
         canvas.height = window.innerHeight;
 
         context.fillStyle = "red";
-        // Create balls
-        for (let i = 0; i < 2; i++) {
+
+        for (let i = 0; i < 1; i++) {
             balls.push(new Ball(
                 900+50*i,
-                50*(i+1),
+                50,
                 Math.random() * 10 + 5,
-                `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
+                {x: 50, y: 0}
             ));
         }
 
@@ -34,7 +34,7 @@ window.addEventListener('load', () => {
 
 
 let t1 = 0;
-const steps = 1;
+const steps = 8;
 const fps = 1000/60;
 function render() {
     requestAnimationFrame(render)
@@ -43,7 +43,7 @@ function render() {
     let dt = t2 - t1;
     if (dt > fps) {
         t1 = t2 - (dt % fps);
-        dt /= steps;
+        dt /= (100*steps);
 
         // Sub-steps
         for (let i = 0; i < steps; i++) {
