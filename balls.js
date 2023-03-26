@@ -4,16 +4,18 @@ class Ball {
     #acceleration;
     #radius;
     #mass;
+    #color
 
     static gravity = {x: 0, y: 9.82}
     static drag = 0.02;
-    static restitution = 0.97; // 1 = no loss of energy (100% elastic), 0 = no bounce
+    static restitution = 0.99; // 1 = no loss of energy (100% elastic), 0 = no bounce
     static rho = 1.225;
 
-    constructor(x, y, radius, initialVelocity = {x: 0, y: 0}) {
+    constructor(x, y, radius, initialVelocity = {x: 0, y: 0}, color = 'black') {
         this.#position = {x: x, y: y};
         this.#velocity = initialVelocity;
         this.#acceleration = {x: 0, y: 0};
+        this.#color = color;
 
         this.#radius = radius;
         this.#mass = (4 / 3 * Math.PI * Math.pow(radius, 3));
@@ -87,7 +89,6 @@ class Ball {
     }
 
     collisionsWithBalls() {
-        // Don't judge, math isn't my forte
         for (let i = 0; i < balls.length; i++) {
             if (this !== balls[i]) {
                 const dx = this.#position.x - balls[i].#position.x;
@@ -146,7 +147,10 @@ class Ball {
 
 
     display() {
-        context.moveTo(this.#position.x, this.#position.y);
+        context.beginPath();
+        //context.moveTo(this.#position.x, this.#position.y);
         context.arc(this.#position.x, this.#position.y, this.#radius, 0, 2 * Math.PI);
+        context.fillStyle = this.#color;
+        context.fill();
     }
 }
