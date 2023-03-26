@@ -10,5 +10,28 @@
 </head>
 <body>
     <canvas id="canvas"></canvas>
+    <div class="outer">
+        <div>
+            <p id = "totalBallsP">Total Balls: 0</p>
+            <button id="clearBalls" onclick="clearBalls()">Clear Balls</button>
+            <p id="restP">Elasticity: 98%</p>
+            <input type="range" id="restitution" min="0" max="1" value="0.98" step="0.01" oninput="changeRestitution(this.value)">
+            <p id="rhoP">Rho: 0.5</p>
+            <input type="range" id="rho" min="0" max="15" value="0.5" step="0.01" oninput="changeRho(this.value)">
+            <p id="dragP">Drag: 0.1</p>
+            <input type="range" id="drag" min="0" max="1" value="0.1" step="0.01" oninput="changeDrag(this.value)">
+            <p id="radiusP">Radius: 10</p>
+            <input type="range" id="radius" min="1" max="25" value="10" step="1" oninput="changeRadius(this.value)">
+            <p id="initialVelocityXP">Velocity X: 0</p>
+            <input type="range" id="VelocityX" min="-100" max="100" value="0" step="1" oninput="changeInitialVelocityX(this.value)">
+            <p id="initialVelocityYP">Velocity Y: 0</p>
+            <input type="range" id="VelocityY" min="-100" max="100" value="0" step="1" oninput="changeInitialVelocityY(this.value)">
+            <p id="spawnRateP">Spawn Interval: 10</p>
+            <input type="range" id="spawnRate" min="10" max="1000" value="100" step="1" oninput="changeSpawnRate(this.value)">
+        </div>
+
+
+    </div>
+
 </body>
 </html>
