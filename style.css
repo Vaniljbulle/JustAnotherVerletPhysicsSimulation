@@ -10,6 +10,27 @@ canvas{
     z-index: 0;
 }
 
+p {
+    padding-left: 10px;
+    margin-bottom: 0;
+    margin-top: 5px;
+}
+
+#clearBalls {
+    margin: 8px;
+}
+div.outer {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    height: auto;
+    background: whitesmoke;
+    border: salmon 2px solid;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+
 .message {
     position: absolute;
     z-index: 1;
@@ -20,10 +41,8 @@ canvas{
     font-weight: bold;
     color: #d4ff5a;
     text-shadow: 0 1px 2px black, 0 1px 2px black, 0 1px 2px black, 0 1px 2px black;
-
     pointer-events: none;
     user-select: none;
-
     animation: fadeOut 10s;
     animation-fill-mode: forwards;
 }
