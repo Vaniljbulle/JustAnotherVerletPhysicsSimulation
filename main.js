@@ -18,19 +18,33 @@ window.addEventListener('load', () => {
         canvas.addEventListener('mousemove', spawnBall);
         resizeCanvas();
 
-        /*
-        for (let i = 0; i < 0; i++) {
-            balls.push(new Ball(
-                1000,
-                500,
-                //Math.random() * 25 + 5,
-                10,
-                {x: 5, y: -5},
-                `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
-            ));
-        }
+/*
+        balls.push(new Ball(
+            400,
+            400,
+            //Math.random() * 25 + 5,
+            50,
+            {x: 0, y: 30},
+        ));
+        balls[0].mass = 10000000000000
 
-        */
+        /*
+        let t = setInterval(() => {
+            balls.push(new Ball(
+                400,
+                400,
+                //Math.random() * 25 + 5,
+                5,
+                {x: 50, y: 0},
+            ));
+            document.getElementById('totalBallsP').innerHTML = "Balls: " + balls.length;
+            // clear interval after 1000 balls
+            if (balls.length > 200) {
+                clearInterval(t);
+            }
+        }, 50);
+
+         */
 
         requestAnimationFrame(render)
     }
@@ -68,13 +82,13 @@ function changeSpawnRate(e) {
 }
 
 function changeInitialVelocityX(e) {
-    initialVelocityX = parseInt(e*10);
+    initialVelocityX = parseInt(e * 10);
     console.log("Velocity X: " + initialVelocityX);
     document.getElementById('initialVelocityXP').innerHTML = "Velocity X: " + e;
 }
 
 function changeInitialVelocityY(e) {
-    initialVelocityY = parseInt(e*10);
+    initialVelocityY = parseInt(e * 10);
     console.log("Velocity Y: " + initialVelocityY);
     document.getElementById('initialVelocityYP').innerHTML = "Velocity Y: " + e;
 }
@@ -90,7 +104,7 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
 }
 
-function isFloat(n){
+function isFloat(n) {
     return Number(n) === n && n % 1 !== 0;
 }
 
@@ -125,7 +139,7 @@ function render() {
     let dt = t2 - t1;
     if (dt > fps) {
         t1 = t2 - (dt % fps);
-        dt /= (1000 * steps);
+        dt /= (10 * steps);
 
         // Sub-steps
         for (let i = 0; i < steps; i++) {
