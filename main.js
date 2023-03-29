@@ -244,16 +244,17 @@ function render() {
         for (let i = 0; i < steps; i++)
             updateBalls(dt);
 
-
+        // Render
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.beginPath();
         for (let i = 0; i < balls.length; i++) {
             balls[i].display();
 
+            // Velocity lines
             const v = balls[i].getVelocity();
             if (v[0] === 0 && v[1] === 0 || !educ) continue;
             PaintVelocity(i, v);
         }
+        // Collision lines
         PaintCollision();
     }
 }
