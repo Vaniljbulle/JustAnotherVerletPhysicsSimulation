@@ -15,7 +15,12 @@ class Ball {
     static gravity = {x: 0, y: 0}
     static drag = 0.1;
     static restitution = 0.98; // 1 = no loss of energy (100% elastic), 0 = no bounce
-    static rho = 0.5;
+    static rho = 0.1;
+
+    static horizontalCollisionLine = null;
+    static verticalCollisionLine = null;
+    static collisionOutput1 = null;
+    static collisionOutput2 = null;
 
     constructor(x, y, radius, initialVelocity = {x: 0, y: 0}, color = 'black') {
         this.#positionX = x;
@@ -27,19 +32,16 @@ class Ball {
         this.#color = color;
 
         this.#radius = radius;
-        this.#mass = 4 / 3 * Math.PI * Math.pow(this.#radius * 5, 3);
-        //this.#mass = Math.PI * Math.pow(this.#radius, 2);
+
+        this.#mass = (4 / 3) * Math.PI * Math.pow(this.#radius, 3);
+        //this.#mass = Math.PI * Math.pow(this.#radius, 3);
         //this.#mass = this.#radius ** 2;
     }
 
     update(dt) {
         this.updatePosition(dt);
-        const [accelX, accelY] = this.newAcceleration();
-        [this.#velocityX, this.#velocityY] = this.newVelocity(dt, accelX, accelY);
-        this.#accelerationX = accelX;
-        this.#accelerationY = accelY;
-        this.solveCollision();
-        //this.updatePosition(dt);
+        this.updateVelocity(dt);
+        this.solveCollision(dt);
         this.constrain();
     }
 
@@ -56,10 +58,13 @@ class Ball {
         return [Ball.gravity.x - ax, Ball.gravity.y - ay];
     }
 
-    newVelocity(dt, accelX, accelY) {
-        const velX = this.#velocityX + (this.#accelerationX + accelX) * dt * 0.5;
-        const velY = this.#velocityY + (this.#accelerationY + accelY) * dt * 0.5;
-        return [velX, velY];
+    updateVelocity(dt) {
+        [this.#accelerationX, this.#accelerationY] = this.newAcceleration();
+        this.#velocityX += this.#accelerationX * dt * 0.5;
+        this.#velocityY += this.#accelerationY * dt * 0.5;
+
+        this.#accelerationX = 0;
+        this.#accelerationY = 0;
     }
 
     updatePosition(dt) {
@@ -85,50 +90,88 @@ class Ball {
         }
     }
 
+
+    kineticEnergy(m1, m2, v1, v2) {
+        return 0.5 * m1 * v1 * v1 + 0.5 * m2 * v2 * v2;
+    }
+
+    momentum(m1, m2, v1, v2) {
+        return m1 * v1 + m2 * v2;
+    }
+
+    getVelocity() {
+        return [this.#velocityX, this.#velocityY]
+    }
+
+    getAcceleration() {
+        return [this.#accelerationX, this.#accelerationY]
+    }
+
+    getPosition() {
+        return [this.#positionX, this.#positionY]
+    }
+
+    setRadius(radius) {
+        this.#radius = radius;
+    }
+
+    // Dot product
+    dot(a, b) {
+        return a[0] * b[0] + a[1] * b[1];
+    }
+
     solveCollision() {
-        const [thisVelX, thisVelY, thisAccX, thisAccY, thisPosX, thisPosY] = [this.#velocityX, this.#velocityY, this.#accelerationX, this.#accelerationY, this.#positionX, this.#positionY];
-        const thisMass = this.#mass;
+        const [v1x, v1y, thisPosX, thisPosY, m1] = [this.#velocityX, this.#velocityY, this.#positionX, this.#positionY, this.#mass];
         for (let ball of balls) {
             if (ball === this) continue;
             const dx = thisPosX - ball.#positionX;
             const dy = thisPosY - ball.#positionY;
             const dsqr = dx * dx + dy * dy;
             if (dsqr < (this.#radius + ball.#radius) ** 2) {
-                const distance = Math.sqrt(dsqr);
                 const theta = Math.atan2(dy, dx);
-                const totalEnergyBefore = 0.5 * thisMass * (thisVelX * thisVelX + thisVelY * thisVelY) + 0.5 * ball.#mass * (ball.#velocityX * ball.#velocityX + ball.#velocityY * ball.#velocityY);
+                const col_vec = [Math.cos(theta), Math.sin(theta)];
+                const col_vec_perp = [-Math.sin(theta), Math.cos(theta)];
 
-                let thisVel = thisVelX * Math.cos(theta) + thisVelY * Math.sin(theta);
-                let ballVel = ball.#velocityX * Math.cos(theta) + ball.#velocityY * Math.sin(theta);
+                const v1_col = this.dot([v1x, v1y], col_vec);
+                const v2_col = this.dot([ball.#velocityX, ball.#velocityY], col_vec);
 
-                let thisVelPrime = (thisVel * (thisMass - ball.#mass) + 2 * ball.#mass * ballVel) / (thisMass + ball.#mass);
-                let ballVelPrime = (ballVel * (ball.#mass - thisMass) + 2 * thisMass * thisVel) / (thisMass + ball.#mass);
+                const v1_perp = this.dot([v1x, v1y], col_vec_perp);
+                const v2_perp = this.dot([ball.#velocityX, ball.#velocityY], col_vec_perp);
 
-                this.#velocityX += (thisVelPrime - thisVel) * Math.cos(theta);
-                this.#velocityY += (thisVelPrime - thisVel) * Math.sin(theta);
-                ball.#velocityX += (ballVelPrime - ballVel) * Math.cos(theta);
-                ball.#velocityY += (ballVelPrime - ballVel) * Math.sin(theta);
+                const v1_col_f = ((m1 - m1) * v1_col + 2 * m1 * v2_col) / (m1 + m1);
+                const v2_col_f = ((m1 - m1) * v2_col + 2 * m1 * v1_col) / (m1 + m1);
 
-                const totalEnergyAfter = 0.5 * thisMass * (this.#velocityX * this.#velocityX + this.#velocityY * this.#velocityY) + 0.5 * ball.#mass * (ball.#velocityX * ball.#velocityX + ball.#velocityY * ball.#velocityY);
-                if (Math.trunc(totalEnergyBefore) !== Math.trunc(totalEnergyAfter))
-                console.log(totalEnergyBefore, totalEnergyAfter);
+                const v1_f = [v1_col_f * col_vec[0] + v1_perp * col_vec_perp[0], v1_col_f * col_vec[1] + v1_perp * col_vec_perp[1]];
+                const v2_f = [v2_col_f * col_vec[0] + v2_perp * col_vec_perp[0], v2_col_f * col_vec[1] + v2_perp * col_vec_perp[1]];
 
-                const overlap = (this.#radius + ball.#radius - distance);
-                const overlapX = overlap * Math.cos(theta);
-                const overlapY = overlap * Math.sin(theta);
-                this.#positionX += overlapX;
-                this.#positionY += overlapY;
-                ball.#positionX -= overlapX;
-                ball.#positionY -= overlapY;
+                // update velocity
+                this.#velocityX = v1_f[0] * Ball.restitution;
+                this.#velocityY = v1_f[1] * Ball.restitution;
+                ball.#velocityX = v2_f[0] * Ball.restitution;
+                ball.#velocityY = v2_f[1] * Ball.restitution;
+
+                Ball.verticalCollisionLine = (this.#positionX * ball.#radius + ball.#positionX * this.#radius) / (this.#radius + ball.#radius);
+                Ball.horizontalCollisionLine = (this.#positionY * ball.#radius + ball.#positionY * this.#radius) / (this.#radius + ball.#radius);
+
+                // Set collision output to balls direction
+                Ball.collisionOutput1 = [this.#velocityX, this.#velocityY];
+                Ball.collisionOutput2 = [ball.#velocityX, ball.#velocityY];
+
+                const overlap = (this.#radius + ball.#radius) - Math.sqrt(dsqr);
+                this.#positionX += col_vec[0] * overlap;
+                this.#positionY += col_vec[1] * overlap;
+                ball.#positionX -= col_vec[0] * overlap;
+                ball.#positionY -= col_vec[1] * overlap;
             }
         }
     }
 
     display() {
         context.beginPath();
-        //context.moveTo(this.#position.x, this.#position.y);
+        context.moveTo(this.#positionX, this.#positionY);
         context.arc(this.#positionX, this.#positionY, this.#radius, 0, 2 * Math.PI);
         context.fillStyle = this.#color;
         context.fill();
     }
 }
+
