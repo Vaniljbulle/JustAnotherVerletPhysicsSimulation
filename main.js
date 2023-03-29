@@ -57,7 +57,8 @@ let t1_sb = performance.now();
 let spawnRate = 100;
 let initialVelocityX = 0;
 let initialVelocityY = 0;
-let initialRadius = 10;
+let initialRadius = 25;
+
 function spawnBall(e) {
     if (e.buttons !== 1 || performance.now() - t1_sb < spawnRate) return;
     t1_sb = performance.now();
@@ -84,16 +85,39 @@ function spawnBallC(velocityX, velocityY, posX, posY, radius, color) {
 
 let educ = false;
 let mode2 = false;
+
+function DefaultValues() {
+    Ball.gravity = {x: 0, y: 0};
+    Ball.drag = 0;
+    Ball.restitution = 1;
+    Ball.rho = 0;
+
+    document.getElementById('spawnRateP').value = 100;
+    document.getElementById('initialVelocityXP').value = 0;
+    document.getElementById('initialVelocityYP').value = 0;
+    document.getElementById('radius').value = 25;
+    document.getElementById('spawnRateP').innerHTML = "Spawn Interval: " + 100;
+    document.getElementById('initialVelocityXP').innerHTML = "Velocity X: " + 0;
+    document.getElementById('initialVelocityYP').innerHTML = "Velocity Y: " + 0;
+    document.getElementById('radiusP').innerHTML = "Radius: " + 25;
+
+    document.getElementById('drag').value = 0;
+    document.getElementById('rho').value = 0;
+    document.getElementById('dragP').innerHTML = "Drag: " + 0;
+    document.getElementById('rhoP').innerHTML = "Rho: " + 0;
+
+    document.getElementById('restitution').value = 1;
+    document.getElementById('restP').innerHTML = "Elasticity: " + 100 + "%";
+}
+
 function changeDropdown(e) {
     switch (e) {
         case '0':
             educ = false;
             // Playground
             clearBalls();
-            Ball.gravity = {x: 0, y: 0};
-            Ball.drag = 0.1;
-            Ball.restitution = 0.98;
-            Ball.rho = 0.1;
+            DefaultValues();
+
             document.getElementById('playground').style.display = 'block';
             document.getElementById('educational').style.display = 'none';
             canvas.addEventListener('mousemove', spawnBall);
@@ -102,10 +126,7 @@ function changeDropdown(e) {
         case '1':
             educ = true;
             // Educational
-            Ball.gravity = {x: 0, y: 0};
-            Ball.drag = 0.0;
-            Ball.restitution = 1;
-            Ball.rho = 0.0;
+            DefaultValues();
             document.getElementById('playground').style.display = 'none';
             document.getElementById('educational').style.display = 'block';
             canvas.removeEventListener('mousemove', spawnBall);
@@ -116,21 +137,21 @@ function changeDropdown(e) {
 }
 
 function eduMode1() {
-    mode2 = false;
     clearBalls();
-    let sped = 10;
-    for (let i = 50; i < canvas.width - 50; i+=100) {
+    mode2 = false;
+    let sped = 50;
+    for (let i = 50; i < canvas.width - 50; i += 100) {
         spawnBallC(0, 0, i, canvas.height / 2, 50, 'orange');
-        spawnBallC(0, sped+=5, i, 100, 50, 'blue');
+        spawnBallC(0, sped += 20, i, 100, 50, 'blue');
     }
 }
 
 function eduMode2() {
-    mode2 = true;
     clearBalls();
-    spawnBallC(-30, -30, canvas.width / 2 + 100, canvas.height / 2 + 100, 100, 'purple');
-    spawnBallC(30, 30, canvas.width / 2 - 100, canvas.height / 2 - 100, 100, 'orange');
-    spawnBallC(30, 0, 0, canvas.height / 2, 100, 'pink');
+    mode2 = true;
+    spawnBallC(-70, -70, canvas.width / 2 + 100, canvas.height / 2 + 100, 100, 'purple');
+    spawnBallC(70, 70, canvas.width / 2 - 100, canvas.height / 2 - 100, 100, 'orange');
+    spawnBallC(70, 0, 0, canvas.height / 2, 100, 'pink');
 }
 
 function clearBalls() {
@@ -199,33 +220,37 @@ let t1 = 0;
 const steps = 8;
 const fps = 1000 / 60;
 
-function PaintCollision() {
-    if (educ && mode2) {
-        context.beginPath();
-        context.moveTo(0, Ball.horizontalCollisionLine);
-        context.lineTo(canvas.width, Ball.horizontalCollisionLine);
-        context.moveTo(Ball.verticalCollisionLine, 0);
-        context.lineTo(Ball.verticalCollisionLine, canvas.height);
-        context.strokeStyle = 'blue';
-        context.lineWidth = 1;
-        context.stroke();
+function PaintCollisionDirection() {
+    context.beginPath();
+    context.moveTo(Ball.verticalCollisionLine, Ball.horizontalCollisionLine);
+    context.lineTo(Ball.verticalCollisionLine + Ball.collisionOutput1[0] * 800, Ball.horizontalCollisionLine + Ball.collisionOutput1[1] * 800);
+    context.moveTo(Ball.verticalCollisionLine, Ball.horizontalCollisionLine);
+    context.lineTo(Ball.verticalCollisionLine + Ball.collisionOutput2[0] * 800, Ball.horizontalCollisionLine + Ball.collisionOutput2[1] * 800);
+    context.strokeStyle = 'green';
+    context.stroke();
+}
 
-        context.beginPath();
-        context.moveTo(Ball.verticalCollisionLine, Ball.horizontalCollisionLine);
-        context.lineTo(Ball.verticalCollisionLine + Ball.collisionOutput1[0] * 800, Ball.horizontalCollisionLine + Ball.collisionOutput1[1] * 800);
-        context.moveTo(Ball.verticalCollisionLine, Ball.horizontalCollisionLine);
-        context.lineTo(Ball.verticalCollisionLine + Ball.collisionOutput2[0] * 800, Ball.horizontalCollisionLine + Ball.collisionOutput2[1] * 800);
-
-        context.strokeStyle = 'green';
-        context.stroke();
-    }
+function PaintCollisionPoint() {
+    context.beginPath();
+    context.moveTo(0, Ball.horizontalCollisionLine);
+    context.lineTo(canvas.width, Ball.horizontalCollisionLine);
+    context.moveTo(Ball.verticalCollisionLine, 0);
+    context.lineTo(Ball.verticalCollisionLine, canvas.height);
+    context.strokeStyle = 'blue';
+    context.lineWidth = 1;
+    context.stroke();
 }
 
 function PaintVelocity(i, v) {
     const p = balls[i].getPosition();
     context.beginPath();
     context.moveTo(p[0], p[1]);
-    context.lineTo(p[0] + v[0] * 5, p[1] + v[1] * 5);
+    context.lineTo(p[0] + v[0], p[1] + v[1]);
+    context.lineTo(p[0] + v[0] - 15 * Math.cos(Math.atan2(v[1], v[0]) + Math.PI / 4), p[1] + v[1] - 15 * Math.sin(Math.atan2(v[1], v[0]) + Math.PI / 4));
+    context.moveTo(p[0] + v[0], p[1] + v[1]);
+    context.lineTo(p[0] + v[0] - 15 * Math.cos(Math.atan2(v[1], v[0]) - Math.PI / 4), p[1] + v[1] - 15 * Math.sin(Math.atan2(v[1], v[0]) - Math.PI / 4));
+
+
     context.strokeStyle = 'red';
     context.lineWidth = 2;
     context.stroke();
@@ -237,8 +262,8 @@ function render() {
     const t2 = performance.now();
     let dt = t2 - t1;
     if (dt > fps) {
-        t1 = t2 - (dt % fps);
-        dt /= (100 * steps);
+        t1 = performance.now();
+        dt /= (1000 * steps);
 
         // Sub-steps
         for (let i = 0; i < steps; i++)
@@ -254,8 +279,23 @@ function render() {
             if (v[0] === 0 && v[1] === 0 || !educ) continue;
             PaintVelocity(i, v);
         }
-        // Collision lines
-        PaintCollision();
+        if (educ && mode2) {
+            PaintCollisionPoint();
+            PaintCollisionDirection();
+        }
+
+
+        /*
+        let totalMomentum = [0, 0];
+        for (let i = 0; i < balls.length; i++) {
+            const v = balls[i].getVelocity();
+            const m = balls[i].getMass();
+            totalMomentum[0] += Math.abs(v[0]) * m;
+            totalMomentum[1] += Math.abs(v[1]) * m;
+        }
+        console.log("Total Momentum: " + (totalMomentum[0] + totalMomentum[1]) + " // " + totalMomentum);
+        */
+
     }
 }
 
