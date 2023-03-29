@@ -17,9 +17,14 @@ p {
     margin-top: 5px;
 }
 
+select {
+    margin: 5px 10px;
+}
+
 #clearBalls {
     margin: 8px;
 }
+
 div.outer {
     position: absolute;
     top: 20px;
