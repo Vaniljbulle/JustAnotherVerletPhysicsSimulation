@@ -154,6 +154,10 @@ function eduMode2() {
     spawnBallC(70, 0, 0, canvas.height / 2, 100, 'pink');
 }
 
+function waterMode1() {
+
+}
+
 function clearBalls() {
     balls = [];
     document.getElementById('totalBallsP').innerHTML = "Balls: " + balls.length;
@@ -168,13 +172,13 @@ function changeSpawnRate(e) {
 function changeInitialVelocityX(e) {
     initialVelocityX = parseInt(e * 10);
     //console.log("Velocity X: " + initialVelocityX);
-    document.getElementById('initialVelocityXP').innerHTML = "Velocity X: " + e;
+    document.getElementById('initialVelocityXP').innerHTML = "Velocity X: " + e*10;
 }
 
 function changeInitialVelocityY(e) {
     initialVelocityY = parseInt(e * 10);
     //console.log("Velocity Y: " + initialVelocityY);
-    document.getElementById('initialVelocityYP').innerHTML = "Velocity Y: " + e;
+    document.getElementById('initialVelocityYP').innerHTML = "Velocity Y: " + e*10;
 }
 
 function changeRadius(e) {
@@ -199,14 +203,14 @@ function isFloat(n) {
 function changeRho(e) {
     Ball.rho = parseFloat(e);
     //console.log("Rho: " + Ball.rho);
-    document.getElementById('rhoP').innerHTML = "Rho: " + e;
+    document.getElementById('rhoP').innerHTML = "Rho: " + e/10;
 }
 
 function changeDrag(e) {
     Ball.drag = parseFloat(e);
     //console.log("Drag: " + Ball.drag);
     //console.log("isFloat: " + isFloat(Ball.drag));
-    document.getElementById('dragP').innerHTML = "Drag: " + e;
+    document.getElementById('dragP').innerHTML = "Drag: " + e/10;
 }
 
 function changeRestitution(e) {
@@ -285,7 +289,7 @@ function render() {
         }
 
 
-        /*
+/*
         let totalMomentum = [0, 0];
         for (let i = 0; i < balls.length; i++) {
             const v = balls[i].getVelocity();
@@ -294,7 +298,7 @@ function render() {
             totalMomentum[1] += Math.abs(v[1]) * m;
         }
         console.log("Total Momentum: " + (totalMomentum[0] + totalMomentum[1]) + " // " + totalMomentum);
-        */
+*/
 
     }
 }

@@ -11,10 +11,9 @@ class Ball {
     #mass;
     #color
 
-    //static maxVelocity = 1000;
     static gravity = {x: 0, y: 0}
     static drag = 0.0;
-    static restitution = 1; // 1 = no loss of energy (100% elastic), 0 = no bounce
+    static restitution = 0.99; // 1 = no loss of energy (100% elastic), 0 = no bounce
     static rho = 0.0;
 
     static horizontalCollisionLine = null;
@@ -35,16 +34,22 @@ class Ball {
 
         //this.#mass = (4 / 3) * Math.PI * Math.pow(this.#radius, 3);
         //this.#mass = Math.PI * Math.pow(this.#radius, 3);
-        this.#mass = this.#radius * 5;
+        this.#mass = this.#radius * 2;
     }
 
     update(dt) {
         this.updatePosition(dt);
-        this.constrain();
-        this.solveCollision(dt);
         this.updateVelocity(dt);
+        this.solveCollision(dt);
+        this.constrain();
         //this.solveCollision(dt);
-        //this.constrain();
+
+    }
+
+    updateWaterMode(dt) {
+        this.updatePosition(dt);
+        this.constrain();
+        this.updateVelocity(dt);
     }
 
     newAcceleration() {
@@ -70,8 +75,8 @@ class Ball {
         if (Math.abs(this.#velocityY) < 0.00000001)
             this.#velocityY = 0;
 
-        //this.#accelerationX = 0;
-        //this.#accelerationY = 0;
+        this.#accelerationX = 0;
+        this.#accelerationY = 0;
     }
 
     updatePosition(dt) {
@@ -126,7 +131,7 @@ class Ball {
         this.#radius = radius;
         //this.#mass = (4 / 3) * Math.PI * Math.pow(this.#radius, 3);
         //this.#mass = Math.PI * Math.pow(this.#radius, 3);
-        this.#mass = this.#radius * 5;
+        this.#mass = this.#radius * 2;
     }
 
     // Dot product
@@ -188,7 +193,7 @@ class Ball {
                     Ball.collisionOutput2 = [ball.#velocityX, ball.#velocityY];
                 }
 
-                const overlap = (this.#radius + ball.#radius) - Math.sqrt(dsqr);
+                const overlap = ((this.#radius + ball.#radius) - Math.sqrt(dsqr));
                 this.#positionX += col_vec[0] * overlap;
                 this.#positionY += col_vec[1] * overlap;
                 ball.#positionX -= col_vec[0] * overlap;

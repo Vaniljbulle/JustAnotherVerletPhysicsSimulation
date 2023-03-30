@@ -16,13 +16,14 @@
             <select id="dropdown" onchange="changeDropdown(this.value)">
                 <option value="0">Playground</option>
                 <option value="1">Educational</option>
+                <option value="2">Waterfall</option>
             </select>
         </div>
         <div id="playground">
             <p id = "totalBallsP">Balls: 0</p>
             <button id="clearBalls" onclick="clearBalls()">Clear Balls</button>
-            <p id="restP">Elasticity: 100%</p>
-            <input type="range" id="restitution" min="0" max="1" value="1" step="0.01" oninput="changeRestitution(this.value)">
+            <p id="restP">Elasticity: 99%</p>
+            <input type="range" id="restitution" min="0" max="0.99" value="0.99" step="0.01" oninput="changeRestitution(this.value)">
             <p id="rhoP">Rho: 0</p>
             <input type="range" id="rho" min="0" max="10" value="0" step="0.01" oninput="changeRho(this.value)">
             <p id="dragP">Drag: 0</p>
@@ -40,6 +41,8 @@
             <button id="Mode 1" onclick="eduMode1()">Mode 1</button>
             <button id="Mode 2" onclick="eduMode2()">Mode 2</button>
         </div>
+        <div id="waterfall" style="display: none">
+            <button id="WaterMode 1" onclick="waterMode1()">Mode 1</button>
 
 
     </div>
