@@ -5,47 +5,60 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Verlet</title>
     <link rel="stylesheet" href="style.css">
-    <script src="balls.js"></script>
-    <script src="main.js"></script>
+    <script type="module" src="main.js"></script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
     <div class="outer">
         <div>
             <!-- drop down menu -->
-            <select id="dropdown" onchange="changeDropdown(this.value)">
-                <option value="0">Playground</option>
-                <option value="1">Educational</option>
-                <option value="2">Waterfall</option>
+            <select id="dropdown">
+                <option value="0">Educational</option>
+                <option value="1">Playground</option>
+                <!--option value="2">Waterfall</option-->
             </select>
         </div>
-        <div id="playground">
-            <p id = "totalBallsP">Balls: 0</p>
-            <button id="clearBalls" onclick="clearBalls()">Clear Balls</button>
-            <p id="restP">Elasticity: 99%</p>
-            <input type="range" id="restitution" min="0" max="0.99" value="0.99" step="0.01" oninput="changeRestitution(this.value)">
-            <p id="rhoP">Rho: 0</p>
-            <input type="range" id="rho" min="0" max="10" value="0" step="0.01" oninput="changeRho(this.value)">
-            <p id="dragP">Drag: 0</p>
-            <input type="range" id="drag" min="0" max="1" value="0" step="0.01" oninput="changeDrag(this.value)">
+        <div id="playground" style="display: none">
+            <button id="clearBalls">Clear Balls</button>
+
+            <p id="elasticityP">Elasticity: 100%</p>
+            <input type="range" id="elasticity" min="0" max="1" value="1" step="0.01">
+
+            <p id="dragP">Drag: 0%</p>
+            <input type="range" id="drag" min="0" max="1" value="0" step="0.01">
+
             <p id="radiusP">Radius: 25</p>
-            <input type="range" id="radius" min="1" max="50" value="25" step="1" oninput="changeRadius(this.value)">
-            <p id="initialVelocityXP">Velocity X: 0</p>
-            <input type="range" id="VelocityX" min="-50" max="50" value="0" step="1" oninput="changeInitialVelocityX(this.value)">
-            <p id="initialVelocityYP">Velocity Y: 0</p>
-            <input type="range" id="VelocityY" min="-50" max="50" value="0" step="1" oninput="changeInitialVelocityY(this.value)">
+            <input type="range" id="radius" min="1" max="100" value="25" step="1">
+
             <p id="spawnRateP">Spawn Interval: 100</p>
-            <input type="range" id="spawnRate" min="10" max="1000" value="100" step="1" oninput="changeSpawnRate(this.value)">
-        </div>
-        <div id="educational" style="display: none">
-            <button id="Mode 1" onclick="eduMode1()">Mode 1</button>
-            <button id="Mode 2" onclick="eduMode2()">Mode 2</button>
-        </div>
-        <div id="waterfall" style="display: none">
-            <button id="WaterMode 1" onclick="waterMode1()">Mode 1</button>
+            <input type="range" id="spawnRate" min="10" max="1000" value="100" step="1">
+
+            <p id="velocityP">Velocity [0, 0]</p>
+            <div class="slider-container">
+                <input id="velx" type="range" min="-20" max="20" value="0" class="slider slider-horizontal">
+                <input id="vely" type="range" min="-20" max="20" value="0" class="slider slider-vertical">
+                <button id="resetVel">Vel Reset</button>
+            </div>
+
+            <p id="gravityP">Gravity [0, 0]</p>
+            <div class="slider-container">
+                <input id="gravX" type="range" min="-50" max="50" value="0" class="slider slider-horizontal">
+                <input id="gravY" type="range" min="-50" max="50" value="0" class="slider slider-vertical">
+                <button id="resetGrav">Grav Reset</button>
+            </div>
 
 
+        </div>
+        <div id="educational">
+            <button class="btn" id="Mode1">Wave</button>
+            <button class="btn"  id="Mode2">Angle attack</button>
+            <button class="btn"  id="Mode3">Hamster drop</button>
+            <button class="btn"  id="Mode4">Elastic transfer</button>
+            <button class="btn"  id="Mode5">Sticky love</button>
+            <button class="btn"  id="Mode6">Mode 6 [NYI]</button>
+        </div>
     </div>
+    <p id="balls">Balls: 0</p>
 
 </body>
 </html>
