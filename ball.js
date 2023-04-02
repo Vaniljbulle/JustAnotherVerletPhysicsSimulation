@@ -3,6 +3,7 @@ export class Ball {
     #velocity;
     #acceleration;
     #force;
+    fixed = false;
 
     static drag = 1;
 
@@ -24,6 +25,7 @@ export class Ball {
     }
 
     update(dt) {
+        if (this.fixed) return;
         this.updatePosition(dt);
         this.updateVelocity(dt/2);
         this.updateAcceleration();
@@ -59,6 +61,7 @@ export class Ball {
     }
 
     applyForce(force) {
+        if (this.fixed) return;
         this.#force = [
             this.#force[0] = force[0],
             this.#force[1] = force[1]
@@ -67,6 +70,10 @@ export class Ball {
 
     get mass() {
         return this.#mass;
+    }
+
+    set mass(mass) {
+        this.#mass = mass;
     }
 
     get radius() {
