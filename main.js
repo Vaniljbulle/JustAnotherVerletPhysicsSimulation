@@ -39,10 +39,9 @@ let playground = false;
 document.getElementById('dropdown').onchange = function (e) {
     solver.reset();
     defaults();
+    cloth = false;
     switch (e.target.value) {
         case '1':
-            solver.store = false;
-            solver.vector = false;
             playground = true;
             document.getElementById('playground').style.display = 'block';
             document.getElementById('educational').style.display = 'none';
@@ -60,6 +59,7 @@ document.getElementById('Mode1').onclick = function () {
     const radius = 50;
     solver.store = false;
     solver.vector = true;
+    cloth = false;
     solver.gravity = [0, 0];
     solver.elasticity = 1;
     for (let i = radius; i < canvas.width - radius; i += radius*2 + 5) {
@@ -72,8 +72,7 @@ document.getElementById('Mode2').onclick = function () {
     solver.reset();
     solver.store = true;
     solver.vector = true;
-    solver.gravity = [0, 0];
-    solver.elasticity = 1;
+    cloth = false;
     solver.addBall([0, canvas.height / 2], [200,0], 150, 'orange');
     solver.addBall([canvas.width, canvas.height / 2], [0,0], 75, 'blue');
     solver.addBall([0, 0], [300,300], 20, 'pink');
@@ -82,9 +81,8 @@ document.getElementById('Mode2').onclick = function () {
 document.getElementById('Mode3').onclick = function () {
     solver.reset();
     solver.vector = true;
-    solver.store = false;
+    cloth = false;
     solver.gravity = [0, 100];
-    solver.elasticity = 1;
     solver.addBall([canvas.width / 2, canvas.height / 2], [0,50], 150, 'orange');
     solver.addBall([canvas.width / 2, canvas.height / 2 - 166], [0,50], 15, 'blue');
 }
@@ -92,21 +90,26 @@ document.getElementById('Mode3').onclick = function () {
 document.getElementById('Mode4').onclick = function () {
     solver.reset();
     solver.vector = true;
-    solver.store = false;
-    solver.gravity = [0, 0];
-    solver.elasticity = 1;
+    cloth = false;
     solver.addBall([0, canvas.height / 2], [1000,0], 25, 'orange');
     solver.addBall([canvas.width / 2, canvas.height / 2], [0,0], 250, 'blue');
 }
 
 document.getElementById('Mode5').onclick = function () {
     solver.reset();
-    solver.vector = false;
-    solver.store = false;
-    solver.gravity = [0, 0];
+    cloth = false;
     solver.elasticity = 0;
     solver.addBall([canvas.width / 2, canvas.height / 2], [0,0], 25, 'blue');
     solver.addBall([30, canvas.height / 2], [100,0], 25, 'orange');
+}
+
+let cloth = false;
+document.getElementById('Mode6').onclick = function () {
+    solver.reset();
+    cloth = true;
+    solver.gravity = [0, 500];
+    solver.drag = 0.1;
+    solver.clothInput(60, 30);
 }
 
 // Drag changed
@@ -149,14 +152,36 @@ let ballInfo = {
 
 // Canvas clicked
 document.getElementById("canvas").onmousedown = function (e) {
-    if (e.button !== 0 || !playground) return;
-    spawn(e);
+    //console.log(e.buttons);
+    if (e.buttons === 1) {
+        if (playground)
+            spawn(e);
+        else
+            selectBall(e);
+    } else if (e.buttons === 4 && cloth) {
+        //solver.destroyLink(selectBall(e));
+    }
+}
+
+document.getElementById("canvas").onmouseup = function (e) {
+    //console.log(e.buttons);
+    if (e.buttons !== 0 || selectedBallIndex === -1) return;
+    solver.fixed(selectedBallIndex, false);
+    selectedBallIndex = -1;
 }
 
 // Canvas mouse move
 document.getElementById("canvas").onmousemove = function (e) {
-    if (e.buttons !== 1 || !playground) return;
-    spawn(e);
+    //console.log(e.buttons);
+    if (e.buttons === 1) {
+        if (playground)
+            spawn(e);
+        else if (selectedBallIndex !== -1)
+            solver.moveBall(selectedBallIndex, [e.clientX, e.clientY]);
+    }else if (e.buttons === 4 && cloth) {
+        //solver.destroyLink(selectBall(e));
+    }
+
 }
 
 let spawnT = performance.now();
@@ -220,6 +245,25 @@ document.getElementById("spawnRate").oninput = function () {
     document.getElementById('spawnRateP').innerHTML = "Spawn Interval: " + parseInt(this.value) + "ms";
 }
 
+let selectedBallIndex = -1;
+function selectBall(e) {
+    const mouse = {
+        x: e.clientX,
+        y: e.clientY
+    }
+    for (let i = 0; i < solver.ballLength(); i++) {
+        const ball = solver.getBall(i);
+        const pos = ball.position;
+        if (mouse.x > pos[0] - ball.radius && mouse.x < pos[0] + ball.radius && mouse.y > pos[1] - ball.radius && mouse.y < pos[1] + ball.radius) {
+            selectedBallIndex = i;
+            solver.fixed(selectedBallIndex, true);
+            //console.log("Selected ball " + i);
+            return i;
+        }
+    }
+}
+
+
 
 let solver;
 const steps = 8;
@@ -232,8 +276,14 @@ function FrameUpdate() {
     if (dt >= fps) {
         dt /= (1000 * steps);
 
-        for (let i = 0; i < steps; i++)
-            solver.update(dt);
+        if (cloth) {
+            for (let i = 0; i < steps; i++)
+                solver.updateLinks(dt);
+        } else{
+            for (let i = 0; i < steps; i++)
+                solver.update(dt);
+        }
+
         solver.render();
 
         t1 = performance.now();
